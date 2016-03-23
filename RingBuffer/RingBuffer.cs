@@ -5,7 +5,6 @@ namespace RingBuffer
     public class RingBuffer<T>
     {
         private T[] _buffer;
-        private int _capacity;
         private int _readPointer;
         private int _writePointer;
         private int _count;
@@ -27,7 +26,6 @@ namespace RingBuffer
 
         public RingBuffer(int capacity)
         {
-            _capacity = capacity;
             _buffer = new T[capacity];
             _readPointer = 0;
             _writePointer = 0;
@@ -36,13 +34,15 @@ namespace RingBuffer
         public void Enqueue(T value)
         {
             _buffer[_writePointer] = value;
-            _writePointer = ++_writePointer % _capacity;
-            _count++;
+            _writePointer = (_writePointer + 1) % _buffer.Length;
 
-            if (_readPointer == _writePointer)
+            if (_count < _buffer.Length)
             {
-                _readPointer = ++_readPointer % _capacity;
                 _count++;
+            }
+            else
+            {
+                _readPointer = (_readPointer + 1) % _buffer.Length;
             }
         }
 
@@ -52,7 +52,8 @@ namespace RingBuffer
                 throw new InvalidOperationException("Collection is empty.");
 
             T value = _buffer[_readPointer];
-            _readPointer = ++_readPointer % _capacity;
+            _buffer[_readPointer] = default(T);
+            _readPointer = (_readPointer + 1) % _buffer.Length;
             _count--;
 
             return value;
@@ -60,8 +61,10 @@ namespace RingBuffer
 
         public void Clear()
         {
-            for (int i = 0; i < _capacity; i++)
+            for (int i = 0; i < _buffer.Length; i++)
+            {
                 _buffer[i] = default(T);
+            }
             _readPointer = 0;
             _writePointer = 0;
             _count = 0;

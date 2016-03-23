@@ -28,7 +28,7 @@ namespace RingBuffer.Tests
             buffer.Enqueue(9);
             buffer.Enqueue(10);
 
-            Assert.AreEqual(9, buffer.Dequeue());
+            Assert.AreEqual(8, buffer.Dequeue());
         }
 
         [TestMethod]
